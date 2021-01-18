@@ -1,7 +1,36 @@
+/*
+
+!!!!!!!!!!!!!!!!!!!
+Alive ...... 
+Alive ...... 
+Locomotion ...... 
+Alive ...... 
+Locomotion ...... 
+Stand ...... 
++++++++++++++++++++
+Alive ...... 
+Locomotion ...... 
+Stand ...... 
+-------------------
+Alive ...... 
+Locomotion ...... 
+Stand ...... 
+Alive ...... 
+Locomotion ...... 
+Move ...... 
+@@@@@@@@@@@@@@@@@@@
+Alive ...... 
+Dead ...... 
+
+
+*/
+
 // inner_entry_transition.cpp
 
+#include <iostream>
 #include "hsm.h"
 
+using namespace std;
 using namespace hsm;
 
 class MyOwner
@@ -12,10 +41,14 @@ public:
 
 	void Die() { mDead = true; }
 
+	void SetMove(bool enable) { mMove = enable; }
+
+	void init();
 private:
 	bool IsDead() const { return mDead; } // Stub
-	bool PressedMove() const { return false; } // Stub
+	bool PressedMove() const { return mMove; } // Stub
 
+	bool mMove;
 	bool mDead;
 
 	friend struct MyStates;
@@ -32,6 +65,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Alive ...... " << endl;
 			if (Owner().IsDead())
 				return SiblingTransition<Dead>();
 
@@ -43,6 +77,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Dead ...... " << endl;
 			return NoTransition();
 		}
 	};
@@ -51,6 +86,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Locomotion ...... " << endl;
 			return InnerEntryTransition<Stand>();
 		}
 	};
@@ -59,6 +95,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Stand ...... " << endl;
 			if (Owner().PressedMove())
 				return SiblingTransition<Move>();
 
@@ -70,6 +107,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Move ...... " << endl;
 			if (!Owner().PressedMove())
 				return SiblingTransition<Stand>();
 
@@ -80,6 +118,13 @@ struct MyStates
 
 MyOwner::MyOwner()
 	: mDead(false)
+	, mMove(false)
+{
+	//mStateMachine.Initialize<MyStates::Alive>(this);
+	//mStateMachine.SetDebugInfo("TestHsm", TraceLevel::Basic);
+}
+
+void MyOwner::init()
 {
 	mStateMachine.Initialize<MyStates::Alive>(this);
 	mStateMachine.SetDebugInfo("TestHsm", TraceLevel::Basic);
@@ -94,7 +139,21 @@ void MyOwner::UpdateStateMachine()
 int main()
 {
 	MyOwner myOwner;
+	cout << "???????????????????" << endl;
+	myOwner.init();
+	cout << "!!!!!!!!!!!!!!!!!!!" << endl;
 	myOwner.UpdateStateMachine();
+	cout << "+++++++++++++++++++" << endl;
+
+	myOwner.UpdateStateMachine();
+	cout << "-------------------" << endl;
+
+	myOwner.SetMove(true);
+	myOwner.UpdateStateMachine();
+
+	cout << "@@@@@@@@@@@@@@@@@@@" << endl;
 	myOwner.Die();
 	myOwner.UpdateStateMachine();
+
+
 }

@@ -1,7 +1,9 @@
 // inner_transition.cpp
 
+#include <iostream>
 #include "hsm.h"
 
+using namespace std;
 using namespace hsm;
 
 class MyOwner
@@ -34,6 +36,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Alive ...... " << endl;
 			if (Owner().IsDead())
 				return SiblingTransition<Dead>();
 
@@ -45,6 +48,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Dead ...... " << endl;
 			return NoTransition();
 		}
 	};
@@ -53,6 +57,7 @@ struct MyStates
 	{
 		virtual Transition GetTransition()
 		{
+			cout << "Locomotion ...... " << endl;
 			if (Owner().PressedMove())
 				return InnerTransition<Move>();
 			else
@@ -62,10 +67,26 @@ struct MyStates
 
 	struct Stand : BaseState
 	{
+		virtual Transition GetTransition()
+		{
+			cout << "Stand ...... " << endl;
+			if (Owner().PressedMove())
+				return SiblingTransition<Move>();
+
+			return NoTransition();
+		}
 	};
 
 	struct Move : BaseState
 	{
+		virtual Transition GetTransition()
+		{
+			cout << "Move ...... " << endl;
+			if (!Owner().PressedMove())
+				return SiblingTransition<Stand>();
+
+			return NoTransition();
+		}
 	};
 };
 
@@ -88,11 +109,11 @@ int main()
 	MyOwner myOwner;
 	myOwner.UpdateStateMachine();
 
-	printf("Set Move = true\n");
+	cout << "------------------Set Move = true" << endl;
 	myOwner.SetMove(true);
 	myOwner.UpdateStateMachine();
 
-	printf("Set Move = false\n");
+	cout << "-------------------Set Move = false" << endl;
 	myOwner.SetMove(false);
 	myOwner.UpdateStateMachine();
 }
