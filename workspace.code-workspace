@@ -1,7 +1,10 @@
 {
 	"folders": [
 		{
-			"path": "."
+			"path": "/home/muyuan/code_github/hsm"
+		},
+		{
+			"path": "/home/muyuan/code_github/my_cpp_test"
 		}
 	],
 	"settings": {
